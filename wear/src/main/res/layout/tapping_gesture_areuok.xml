@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.wearable.view.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".tapping_gesture.TappingGestureActivityAlarme"
+    tools:deviceIds="wear"
+    android:background="@color/black"
+    >
+
+    <TextView
+        android:id="@+id/areUOK"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/alerteCockpit"
+        android:textColor="@color/green"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="0dp"
+        android:textSize="30dp"
+        app:layout_box="all"
+        />
+
+    <Button
+        android:id="@+id/buttonNo"
+        android:text="NO"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+
+        android:layout_height="40dp"
+        android:layout_width="40dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="120dp"
+        android:background="@color/white"
+        android:visibility="invisible"
+
+        />
+
+
+    <Button
+        android:id="@+id/buttonYes"
+        android:text="YES"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+
+        android:layout_height="40dp"
+        android:layout_width="40dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="70dp"
+
+        android:background="@color/white"
+        android:visibility="invisible"
+        />
+
+
+
+    <Button
+        android:id="@+id/buttonTaping"
+        android:text="finger"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_height="200dp"
+        android:layout_width="200dp"
+        android:layout_marginLeft="80dp"
+        android:layout_marginTop="0dp"
+        android:background="@drawable/button_tapping"
+        android:textColor="@color/green" />
+
+
+</android.support.wearable.view.BoxInsetLayout>

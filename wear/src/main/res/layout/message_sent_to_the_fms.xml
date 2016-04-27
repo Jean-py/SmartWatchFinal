@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+
+    <ImageView
+        android:layout_width="184dp"
+        android:layout_height="100dp"
+        android:src="@drawable/alerte"
+        android:id="@+id/imageAlerte"
+        android:layout_weight="0.21"
+        android:layout_marginLeft="30dp"
+        android:onClick="retourPilotingMode"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Message sent to the FMS"
+        android:id="@+id/textView"
+        android:layout_marginLeft="50dp"
+        android:layout_weight="0.26"
+
+
+        />
+
+</LinearLayout>

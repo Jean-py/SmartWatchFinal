@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">ProjetSmartWatch</string>
+    <string name="hello_world">Hello World!</string>
+    <string name="PilotMode">Piloting</string>
+    <string name="RestMode">Resting</string>
+    <string name="alerteCockpit">Alerte cockpit</string>
+    <string name="P2ok">P2 is ok?</string>
+</resources>
