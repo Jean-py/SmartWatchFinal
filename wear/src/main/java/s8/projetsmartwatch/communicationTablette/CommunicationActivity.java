@@ -2,7 +2,6 @@ package s8.projetsmartwatch.communicationTablette;
 
 
 import android.app.Activity;
-import android.app.Service;
 import android.os.Bundle;
 import android.view.View;
 

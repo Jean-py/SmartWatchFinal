@@ -1,9 +1,7 @@
-package s8.projetsmartwatch.tapping_gesture;
+package s8.projetsmartwatch.tapping_gesture.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.view.MotionEventCompat;
-import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.BoxInsetLayout;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,9 +20,11 @@ import java.util.Locale;
 
 import s8.projetsmartwatch.MainActivity;
 import s8.projetsmartwatch.R;
+import s8.projetsmartwatch.tapping_gesture.comportement.TappingGestureView;
+import s8.projetsmartwatch.tapping_gesture.interfaces.MyActivity;
 
 
-public class TappingGestureActivityP2ok extends WearableActivity implements GoogleApiClient.ConnectionCallbacks,MessageApi.MessageListener{
+public class TappingGestureActivityP2ok extends MyActivity implements GoogleApiClient.ConnectionCallbacks,MessageApi.MessageListener{
 
 private final static String START_ACTIVITY = "/start/activity";
 private final static String WEAR_MESSAGE_PATH = "/message";
@@ -41,7 +41,7 @@ private GoogleApiClient mApiC;
     private Button buttonTappingGesture;
     int xButton;
     int yButton;
-    Etat state;
+    TappingGestureView tgv;
 
     Boolean p2Reponse = false ;
     Boolean p1Reponse = false;
@@ -61,8 +61,8 @@ private GoogleApiClient mApiC;
                         if(p1Reponse){
                             System.out.println("P1 viens de reponder");
                             Intent intent = new Intent(TappingGestureActivityP2ok.this, MainActivity.class);
-                            startActivity(intent);
                             finish();
+                            startActivity(intent);
                         }
                     }
                     if (s.equalsIgnoreCase("P2IsNotOk")) {
@@ -72,8 +72,8 @@ private GoogleApiClient mApiC;
                     if(s.equalsIgnoreCase("allIsfine")) {
                         p2Reponse = true;
                         Intent intent = new Intent(TappingGestureActivityP2ok.this, MainActivity.class);
-                        startActivity(intent);
                         finish();
+                        startActivity(intent);
                     }
 
                 }
@@ -81,9 +81,6 @@ private GoogleApiClient mApiC;
         });
     }
 
-    public enum Etat {
-        INIT, FINGER1, FINGER2, TAPPING_GESTURE;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,33 +110,9 @@ private GoogleApiClient mApiC;
         System.out.println("buttonTappingGesture : " + buttonTappingGesture) ;
         xButton = (int) buttonTappingGesture.getX();
         yButton = (int) buttonTappingGesture.getY();
-        state = Etat.INIT;
+        tgv = new TappingGestureView("alerte p2 ok", this);
 
-        buttonTappingGesture.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction() & MotionEvent.ACTION_MASK) {
-
-                    case (MotionEvent.ACTION_UP):
-                        callBackActionUp(event);
-                        break;
-                    case (MotionEvent.ACTION_POINTER_DOWN):
-                        if (stayOnTheButtonTappingGesture(event, 2)) {
-                            callBackActionPointerDown(event);
-                        }
-
-                        break;
-                    case (MotionEvent.ACTION_POINTER_UP):
-                        callBackActionActionPointerUp(event);
-                        break;
-
-                    case (MotionEvent.ACTION_DOWN):
-                        callbackButtonActionDown(event);
-                        break;
-                }
-                return true;
-            }
-        });
+        buttonTappingGesture.setOnTouchListener(tgv);
         //listener bouton No
         buttonNo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -206,88 +179,11 @@ private GoogleApiClient mApiC;
         if(p2Reponse){
             p2Reponse = false;
             Intent intent = new Intent(TappingGestureActivityP2ok.this, MainActivity.class);
-            startActivity(intent);
             finish();
+            startActivity(intent);
         } else {
             sendMessage(WEAR_MESSAGE_PATH,"uSeemOk");
             setContentView(R.layout.waitng_p2);
-        }
-
-    }
-
-    //premier doigt sur l'écran
-    public void callbackButtonActionDown(MotionEvent event) {
-        //System.out.println("Action Down");
-        switch (state) {
-            case INIT:
-                state = Etat.FINGER1;
-                break;
-            case FINGER1:
-                //impossible
-                break;
-            case FINGER2: //impossible
-                break;
-            case TAPPING_GESTURE://impossible
-                break;
-        }
-    }
-
-    //second doigt sur l'écran
-    private void callBackActionPointerDown(MotionEvent event) {
-        //System.out.println("Action pointer down");
-        switch (state) {
-            case INIT:
-                break;
-            case FINGER1:
-                state = Etat.FINGER2;
-                hideButton();
-                break;
-            case FINGER2:
-                //nothing
-                break;
-            case TAPPING_GESTURE:
-                state = Etat.FINGER2;
-                showButton();
-                break;
-        }
-    }
-
-    //premier doigt enlevé
-    private void callBackActionUp(MotionEvent event) {
-        System.out.println("Action up");
-        switch (state) {
-            case INIT:
-                //impossible
-                break;
-            case FINGER1:
-                state = Etat.INIT;
-                hideButton();
-                break;
-            case FINGER2:
-                state = Etat.INIT;
-                hideButton();
-                break;
-            case TAPPING_GESTURE:
-                state = Etat.INIT;
-                hideButton();
-                break;
-        }
-    }
-
-    //on enleve le second doigt
-    private void callBackActionActionPointerUp(MotionEvent event) {
-        //System.out.println("action Pointer up");
-        switch (state) {
-            case INIT: //impossible
-                break;
-            case FINGER1: //impossible
-                break;
-            case FINGER2:
-                state = Etat.TAPPING_GESTURE;
-                showButton();
-                break;
-            case TAPPING_GESTURE: // impossible
-                break;
         }
     }
 
@@ -303,7 +199,7 @@ private GoogleApiClient mApiC;
 
     public void retourPilotingMode(View v){
         Intent intent = new Intent(TappingGestureActivityP2ok.this, MainActivity.class);
-        startActivity(intent);
         finish();
+        startActivity(intent);
     }
 }

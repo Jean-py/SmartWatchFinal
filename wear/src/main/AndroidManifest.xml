@@ -30,7 +30,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".tapping_gesture.TappingGestureActivityAlarme"
+            android:name=".tapping_gesture.activity.TappingGestureActivityAlarme"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.DeviceDefault.Light">
             <intent-filter>
@@ -41,7 +41,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".tapping_gesture.TappingGestureActivityAreUOK"
+            android:name=".tapping_gesture.activity.TappingGestureActivityAreUOK"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.DeviceDefault.Light">
             <intent-filter>
@@ -52,7 +52,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".tapping_gesture.TappingGestureActivityP2ok"
+            android:name=".tapping_gesture.activity.TappingGestureActivityP2ok"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.DeviceDefault.Light">
             <intent-filter>

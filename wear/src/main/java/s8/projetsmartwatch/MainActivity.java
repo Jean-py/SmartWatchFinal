@@ -15,10 +15,11 @@
     import com.google.android.gms.wearable.Node;
     import com.google.android.gms.wearable.NodeApi;
     import com.google.android.gms.wearable.Wearable;
+
     import s8.projetsmartwatch.etat.Etat;
-    import s8.projetsmartwatch.tapping_gesture.TappingGestureActivityAlarme;
-    import s8.projetsmartwatch.tapping_gesture.TappingGestureActivityAreUOK;
-    import s8.projetsmartwatch.tapping_gesture.TappingGestureActivityP2ok;
+    import s8.projetsmartwatch.tapping_gesture.activity.TappingGestureActivityAlarme;
+    import s8.projetsmartwatch.tapping_gesture.activity.TappingGestureActivityAreUOK;
+    import s8.projetsmartwatch.tapping_gesture.activity.TappingGestureActivityP2ok;
 
     public class MainActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks,MessageApi.MessageListener{
 
@@ -90,9 +91,6 @@
                     } else if(Math.abs(deltaX) > MIN_DISTANCE) {
                         setContentView(R.layout.send_message_view);
                     }
-                    else {
-                        // consider as something else - a screen tap for example
-                    }
                     break;
             }
         }
@@ -134,14 +132,14 @@
         }
 
         public void changeActivityForAlarme(){
-            System.out.println("BLOOOO");
+            //System.out.println("BLOOOO");
             Intent intent = new Intent(MainActivity.this, TappingGestureActivityAlarme.class);
             startActivity(intent);
             finish();
         }
 
         public void changeActivityForAreUOk(){
-            System.out.println("BLAAAA");
+           // System.out.println("BLAAAA");
             Intent intent = new Intent(MainActivity.this, TappingGestureActivityAreUOK.class );
             startActivity(intent);
             finish();

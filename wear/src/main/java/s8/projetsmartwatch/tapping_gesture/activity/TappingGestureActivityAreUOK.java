@@ -1,13 +1,8 @@
-package s8.projetsmartwatch.tapping_gesture;
+package s8.projetsmartwatch.tapping_gesture.activity;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.MotionEventCompat;
-import android.support.wearable.activity.WearableActivity;
-import android.support.wearable.view.BoxInsetLayout;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -21,42 +16,62 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 
 import s8.projetsmartwatch.MainActivity;
 import s8.projetsmartwatch.R;
+import s8.projetsmartwatch.tapping_gesture.comportement.TappingGestureView;
+import s8.projetsmartwatch.tapping_gesture.interfaces.MyActivity;
 
 
-public class TappingGestureActivityAreUOK extends WearableActivity implements GoogleApiClient.ConnectionCallbacks,MessageApi.MessageListener{
+public class TappingGestureActivityAreUOK extends MyActivity implements GoogleApiClient.ConnectionCallbacks,MessageApi.MessageListener{
 
 private final static String START_ACTIVITY = "/start/activity";
 private final static String WEAR_MESSAGE_PATH = "/message";
 private GoogleApiClient mApiClient;
 private GoogleApiClient mApiC;
 
+    /**
+     * Cette classe permet de lancer un Tapping gesture permettant de
+     * confirmer que le Pilote va bien
+     *
+     */
     private static final SimpleDateFormat AMBIENT_DATE_FORMAT =
             new SimpleDateFormat("HH:mm", Locale.US);
 
-    private BoxInsetLayout mContainerView;
-    private TextView mTextView;
-    private TextView mClockView;
     private Button buttonYes;
     private Button buttonNo;
-    private TextView areUOk;
+    private TextView titre;
     private Button buttonTappingGesture;
     int xButton;
     int yButton;
-    Etat state;
+    //La Vi
+    TappingGestureView myView;
 
+
+
+    ///TODO potentiel perte d'information?
     @Override
     public void onMessageReceived(final MessageEvent messageEvent) {
-        //Pas de message reçu lors de la demande du are U OK?
+        //On suppose que Pas de message reçu lors de la demande du are U OK?
     }
 
-    public enum Etat {
-        INIT, FINGER1, FINGER2, TAPPING_GESTURE;
-    }
+   @Override
+   public void showButton() {
+        buttonNo.setVisibility(View.VISIBLE);
+        buttonYes.setVisibility(View.VISIBLE);
+   }
+
+    @Override
+   public void hideButton() {
+        buttonNo.setVisibility(View.INVISIBLE);
+        buttonYes.setVisibility(View.INVISIBLE);
+   }
+
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,42 +92,18 @@ private GoogleApiClient mApiC;
         }
 
         //setAmbientEnabled();
-        mContainerView = (BoxInsetLayout) findViewById(R.id.container);
-        mTextView = (TextView) findViewById(R.id.text);
         buttonYes = (Button) findViewById(R.id.buttonYes);
         buttonNo = (Button) findViewById(R.id.buttonNo);
-        areUOk = (TextView) findViewById(R.id.areUOK);
+        titre = (TextView) findViewById(R.id.areUOK);
         buttonTappingGesture = (Button) findViewById(R.id.buttonTaping);
-        System.out.println("buttonTappingGesture : " + buttonTappingGesture) ;
+      //  System.out.println("buttonTappingGesture : " + buttonTappingGesture) ;
         xButton = (int) buttonTappingGesture.getX();
         yButton = (int) buttonTappingGesture.getY();
-        state = Etat.INIT;
 
-        buttonTappingGesture.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction() & MotionEvent.ACTION_MASK) {
+        //Appel a ma classe qui gère le comportement du tapping gesture
+        TappingGestureView tgv = new TappingGestureView("my tapping gesture 1", this);
+        buttonTappingGesture.setOnTouchListener(tgv);
 
-                    case (MotionEvent.ACTION_UP):
-                        callBackActionUp(event);
-                        break;
-                    case (MotionEvent.ACTION_POINTER_DOWN):
-                        if (stayOnTheButtonTappingGesture(event, 2)) {
-                            callBackActionPointerDown(event);
-                        }
-
-                        break;
-                    case (MotionEvent.ACTION_POINTER_UP):
-                        callBackActionActionPointerUp(event);
-                        break;
-
-                    case (MotionEvent.ACTION_DOWN):
-                        callbackButtonActionDown(event);
-                        break;
-                }
-                return true;
-            }
-        });
         //listener bouton No
         buttonNo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,6 +131,7 @@ private GoogleApiClient mApiC;
 
     }
 
+    //envois un message a la tablette
     private void sendMessage(final String path, final String message){
         new Thread(new Runnable() {
             @Override
@@ -156,18 +148,6 @@ private GoogleApiClient mApiC;
 
 
 
-
-    public boolean stayOnTheButtonTappingGesture(MotionEvent event, int numberOfPointer) {
-
-        boolean res = true;
-        for (int i = 0; i < numberOfPointer; i++) {
-            System.out.println(" getX(" + i + ") : " + event.getX(i) + "   buttonTappingGesture.getX() : " + buttonTappingGesture.getX());
-            System.out.println(" getY(" + i + ") : " + event.getY(i) + "   buttonTappingGesture.getY() : " + buttonTappingGesture.getY());
-            res = res && event.getX(i) > buttonTappingGesture.getX() - 100;
-        }
-        return res;
-    }
-
     public void callbackButtonNo() {
         sendMessage(WEAR_MESSAGE_PATH, "notOk");
         showButton();
@@ -178,97 +158,16 @@ private GoogleApiClient mApiC;
     public void callbackButtonYes() {
             showButton();
             Intent intent = new Intent(TappingGestureActivityAreUOK.this, MainActivity.class);
-            startActivity(intent);
-            finish();
+        finish();
+        startActivity(intent);
     }
 
 
-    //premier doigt sur l'écran
-    public void callbackButtonActionDown(MotionEvent event) {
-        //System.out.println("Action Down");
-        switch (state) {
-            case INIT:
-                state = Etat.FINGER1;
-                break;
-            case FINGER1:
-                //impossible
-                break;
-            case FINGER2: //impossible
-                break;
-            case TAPPING_GESTURE://impossible
-                break;
-        }
-    }
-
-    //second doigt sur l'écran
-    private void callBackActionPointerDown(MotionEvent event) {
-        //System.out.println("Action pointer down");
-        switch (state) {
-            case INIT:
-                break;
-            case FINGER1:
-                state = Etat.FINGER2;
-                hideButton();
-                break;
-            case FINGER2:
-                //nothing
-                break;
-            case TAPPING_GESTURE:
-                state = Etat.FINGER2;
-                showButton();
-                break;
-        }
-    }
-
-    //premier doigt enlevé
-    private void callBackActionUp(MotionEvent event) {
-        System.out.println("Action up");
-        switch (state) {
-            case INIT:
-                //impossible
-                break;
-            case FINGER1:
-                state = Etat.INIT;
-                hideButton();
-                break;
-            case FINGER2:
-                state = Etat.INIT;
-                hideButton();
-                break;
-            case TAPPING_GESTURE:
-                state = Etat.INIT;
-                hideButton();
-                break;
-        }
-    }
-
-    //on enleve le second doigt
-    private void callBackActionActionPointerUp(MotionEvent event) {
-        //System.out.println("action Pointer up");
-        switch (state) {
-            case INIT: //impossible
-                break;
-            case FINGER1: //impossible
-                break;
-            case FINGER2:
-                state = Etat.TAPPING_GESTURE;
-                showButton();
-                break;
-            case TAPPING_GESTURE: // impossible
-                break;
-        }
-    }
-
-    public void showButton() {
-        buttonNo.setVisibility(View.VISIBLE);
-        buttonYes.setVisibility(View.VISIBLE);
-    }
-
-    public void hideButton() {
-        buttonNo.setVisibility(View.INVISIBLE);
-        buttonYes.setVisibility(View.INVISIBLE);
-    }
-
+    /**
+     * Fonction servant a tester les formes de touch.
+     * @param event
+     * @return
+     */
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
@@ -301,14 +200,16 @@ private GoogleApiClient mApiC;
             //buttonYes.setVisibility(View.INVISIBLE);
         }
         */
+
         return super.dispatchTouchEvent(event);
     }
 
 
     public void retourPilotingMode(View v){
         Intent intent = new Intent(TappingGestureActivityAreUOK.this, MainActivity.class);
-        startActivity(intent);
         finish();
+        startActivity(intent);
+
     }
 
 }

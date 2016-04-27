@@ -1,22 +1,6 @@
 package s8.projetsmartwatch;
 
 import android.app.Activity;
-import android.graphics.Color;
-import android.os.Bundle;
-import android.support.v4.view.MotionEventCompat;
-import android.support.wearable.activity.WearableActivity;
-import android.support.wearable.view.DotsPageIndicator;
-import android.support.wearable.view.GridViewPager;
-import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import s8.projetsmartwatch.picker.Element;
-import s8.projetsmartwatch.picker.ElementGridPagerAdapter;
 
 /**
  * Created by jp on 25/04/16.

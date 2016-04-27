@@ -1,24 +1,24 @@
-package s8.projetsmartwatch.tapping_gesture;
+package s8.projetsmartwatch.tapping_gesture.activity;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.MotionEventCompat;
-import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.BoxInsetLayout;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 
 import s8.projetsmartwatch.MainActivity;
 import s8.projetsmartwatch.R;
+import s8.projetsmartwatch.tapping_gesture.comportement.TappingGestureView;
+import s8.projetsmartwatch.tapping_gesture.interfaces.MyActivity;
 
 
-public class TappingGestureActivityAlarme extends WearableActivity {
+public class TappingGestureActivityAlarme extends MyActivity {
 
     private static final SimpleDateFormat AMBIENT_DATE_FORMAT =
             new SimpleDateFormat("HH:mm", Locale.US);
@@ -32,16 +32,14 @@ public class TappingGestureActivityAlarme extends WearableActivity {
     private Button buttonTappingGesture;
     int xButton;
     int yButton;
-    Etat state;
 
-    public enum Etat {
-        INIT, FINGER1, FINGER2, TAPPING_GESTURE;
-    }
+    TappingGestureView tgv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tapping_gesture_alarme);
+        tgv = new TappingGestureView("Tapping alarme" , this);
         //setAmbientEnabled();
         mContainerView = (BoxInsetLayout) findViewById(R.id.container);
         mTextView = (TextView) findViewById(R.id.text);
@@ -52,33 +50,9 @@ public class TappingGestureActivityAlarme extends WearableActivity {
         System.out.println("buttonTappingGesture : " + buttonTappingGesture) ;
         xButton = (int) buttonTappingGesture.getX();
         yButton = (int) buttonTappingGesture.getY();
-        state = Etat.INIT;
 
-        buttonTappingGesture.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction() & MotionEvent.ACTION_MASK) {
+        buttonTappingGesture.setOnTouchListener(tgv );
 
-                    case (MotionEvent.ACTION_UP):
-                        callBackActionUp(event);
-                        break;
-                    case (MotionEvent.ACTION_POINTER_DOWN):
-                        if (stayOnTheButtonTappingGesture(event, 2)) {
-                            callBackActionPointerDown(event);
-                        }
-
-                        break;
-                    case (MotionEvent.ACTION_POINTER_UP):
-                        callBackActionActionPointerUp(event);
-                        break;
-
-                    case (MotionEvent.ACTION_DOWN):
-                        callbackButtonActionDown(event);
-                        break;
-                }
-                return true;
-            }
-        });
         //listener bouton No
         buttonNo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,36 +62,8 @@ public class TappingGestureActivityAlarme extends WearableActivity {
         });
     }
 
-    @Override
-    public void onEnterAmbient(Bundle ambientDetails) {
-        super.onEnterAmbient(ambientDetails);
-        updateDisplay();
-    }
 
-    @Override
-    public void onUpdateAmbient() {
-        super.onUpdateAmbient();
-        updateDisplay();
-    }
 
-    @Override
-    public void onExitAmbient() {
-        updateDisplay();
-        super.onExitAmbient();
-    }
-
-    private void updateDisplay() {
-        if (isAmbient()) {
-            mContainerView.setBackgroundColor(getResources().getColor(android.R.color.holo_purple));
-            mTextView.setTextColor(getResources().getColor(android.R.color.holo_purple));
-            mClockView.setVisibility(View.VISIBLE);
-            mClockView.setText(AMBIENT_DATE_FORMAT.format(new Date()));
-        } else {
-            mContainerView.setBackground(null);
-            mTextView.setTextColor(getResources().getColor(android.R.color.holo_purple));
-            mClockView.setVisibility(View.GONE);
-        }
-    }
 
     public boolean stayOnTheButtonTappingGesture(MotionEvent event, int numberOfPointer) {
 
@@ -132,85 +78,9 @@ public class TappingGestureActivityAlarme extends WearableActivity {
 
     public void callbackButtonNo() {
         Intent intent = new Intent(TappingGestureActivityAlarme.this, MainActivity.class );
-        startActivity(intent);
         finish();
+        startActivity(intent);
        // showButton();
-    }
-
-    //premier doigt sur l'écran
-    public void callbackButtonActionDown(MotionEvent event) {
-        //System.out.println("Action Down");
-        switch (state) {
-            case INIT:
-                state = Etat.FINGER1;
-                break;
-            case FINGER1:
-                //impossible
-                break;
-            case FINGER2: //impossible
-                break;
-            case TAPPING_GESTURE://impossible
-                break;
-        }
-    }
-
-    //second doigt sur l'écran
-    private void callBackActionPointerDown(MotionEvent event) {
-        //System.out.println("Action pointer down");
-        switch (state) {
-            case INIT:
-                break;
-            case FINGER1:
-                state = Etat.FINGER2;
-                hideButton();
-                break;
-            case FINGER2:
-                //nothing
-                break;
-            case TAPPING_GESTURE:
-                state = Etat.FINGER2;
-                showButton();
-                break;
-        }
-    }
-
-    //premier doigt enlevé
-    private void callBackActionUp(MotionEvent event) {
-        System.out.println("Action up");
-        switch (state) {
-            case INIT:
-                //impossible
-                break;
-            case FINGER1:
-                state = Etat.INIT;
-                hideButton();
-                break;
-            case FINGER2:
-                state = Etat.INIT;
-                hideButton();
-                break;
-            case TAPPING_GESTURE:
-                state = Etat.INIT;
-                hideButton();
-                break;
-        }
-    }
-
-    //on enleve le second doigt
-    private void callBackActionActionPointerUp(MotionEvent event) {
-        //System.out.println("action Pointer up");
-        switch (state) {
-            case INIT: //impossible
-                break;
-            case FINGER1: //impossible
-                break;
-            case FINGER2:
-                state = Etat.TAPPING_GESTURE;
-                showButton();
-                break;
-            case TAPPING_GESTURE: // impossible
-                break;
-        }
     }
 
     public void showButton() {
