@@ -4,5 +4,8 @@
     <string name="PilotMode">Piloting</string>
     <string name="RestMode">Resting</string>
     <string name="alerteCockpit">Alerte cockpit</string>
-    <string name="P2ok">P2 is ok?</string>
+
+    <string name="p2ok">P2 is ok?</string>
+    <string name="areUok">Are you ok?</string>
+
 </resources>

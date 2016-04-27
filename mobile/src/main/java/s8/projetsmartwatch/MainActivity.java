@@ -3,11 +3,9 @@ package s8.projetsmartwatch;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -29,7 +27,10 @@ public class MainActivity extends Activity implements MessageApi.MessageListener
     private GoogleApiClient mApiClient;
     private GoogleApiClient mApiC;
 
-    TextView textView;
+    boolean p1Reponse = false;
+    boolean p2Reponse = false;
+
+    TextView textViewP1Reponse;
 
     Button bYes ;
     Button bNo ;
@@ -54,7 +55,7 @@ public class MainActivity extends Activity implements MessageApi.MessageListener
         if (mApiClient != null && !(mApiClient.isConnected() || mApiClient.isConnecting())) {
             mApiClient.connect();
         }
-        textView = (TextView) findViewById(R.id.textView);
+        textViewP1Reponse = (TextView) findViewById(R.id.textView);
     }
 
     @Override
@@ -100,7 +101,7 @@ public class MainActivity extends Activity implements MessageApi.MessageListener
             public void run() {
                 String s = " " ;
                 if (messageEvent.getPath().equalsIgnoreCase(WEAR_MESSAGE_PATH)) {
-                    System.out.println(messageEvent.getPath().toString());
+                    System.out.println("mobile message received : " + messageEvent.getPath().toString());
                     s = new String(messageEvent.getData());
                     System.out.println(s);
                     if (s.equalsIgnoreCase("alarmeVisuelle")) {
@@ -113,9 +114,22 @@ public class MainActivity extends Activity implements MessageApi.MessageListener
                         alarmeTotale();
                     }
                     if(s.equalsIgnoreCase("notOk") ){
-                        textView.setText(messageRecu);
+                        textViewP1Reponse.setText(messageRecu);
                     }
-                    textView.setText(messageRecu);
+                    //reception d'un message P1 lors d'un probleme de santé de P2
+                    if(s.equalsIgnoreCase("P2IsnotOk") ){
+                        System.out.println("Alarme P2 is not OK");
+                        textViewP1Reponse.setText("P2isNotOk");
+                        messageRecu= "P2IsnotOk";
+                        p1Reponse =true;
+                    }
+                    if(s.equalsIgnoreCase("uSeemOk") ){
+
+                        messageRecu = "uSeemOk";
+                        textViewP1Reponse.setText("P2 Seem Ok");
+                       p1Reponse = true;
+                    }
+                    textViewP1Reponse.setText(messageRecu);
                 }
 
             }
@@ -182,7 +196,7 @@ public class MainActivity extends Activity implements MessageApi.MessageListener
 
     public void buttonYesScenario1P2(View v){
         hideButton();
-        sendMessage(WEAR_MESSAGE_PATH,"alarmeTotale");
+        sendMessage(WEAR_MESSAGE_PATH,"P2IsNotOk");
 
     }
 
@@ -190,29 +204,44 @@ public class MainActivity extends Activity implements MessageApi.MessageListener
     public void buttonNoScenario1P2(View v){
         hideButton();
         Timer timer ;
-        new CountDownTimer(30000, 1000) {
 
-            public void onTick(long millisUntilFinished) {
-                if(messageRecu.equals("iamOk")){
-                    hideButton();
-                    cancel();
-                    messageRecu = "";
-                }else if(messageRecu.equals("notOk") ) {
-                    cancel();
+        sendMessage(WEAR_MESSAGE_PATH,"P2IsOk");
+        hideButton();
+        if(!p1Reponse){
+            new CountDownTimer(30000, 1000) {
+
+                public void onTick(long millisUntilFinished) {
+                    textViewP1Reponse.setText("waiting for P1... : " + (30 - millisUntilFinished/1000) );
+                    //P1 repond que  P2 va bien
+                    if(messageRecu.equals("uSeemOk")){
+                        hideButton();
+                        cancel();
+                        messageRecu = "";
+                        p1Reponse = true;
+                        sendMessage(WEAR_MESSAGE_PATH,"allIsfine");
+                        //P1 repond que P2 ne va pas bien
+                    }else if(messageRecu.equals("notOk") ) {
+                        cancel();
+                        hideButton();
+                        messageRecu = "";
+                        System.out.println("ALARME TOTALE SUR MONTRE P2");
+                        p1Reponse = true;
+                        //TODO a voir?
+                        //sendMessage(WEAR_MESSAGE_PATH,"alarmeTotale");
+                    }
+                }
+
+                public void onFinish() {
+                    textViewP1Reponse.setText("Fin du temps " );
                     hideButton();
                     System.out.println("ALARME TOTALE SUR MONTRE P2");
-                    sendMessage(WEAR_MESSAGE_PATH,"alarmeTotale");
-
+                    sendMessage(WEAR_MESSAGE_PATH,"P2NoReponse");
+                    messageRecu = "";
                 }
-            }
+            }.start();
+        }
 
-            public void onFinish() {
-                hideButton();
-                System.out.println("ALARME TOTALE SUR MONTRE P2");
-                sendMessage(WEAR_MESSAGE_PATH,"alarmeTotale");
-                messageRecu = "";
-            }
-        }.start();
+        textViewP1Reponse.setText(" en attente d'un message ... ");
 
     }
 

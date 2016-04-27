@@ -14,7 +14,7 @@
         android:id="@+id/areUOK"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/alerteCockpit"
+        android:text="@string/areUok"
         android:textColor="@color/green"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="0dp"

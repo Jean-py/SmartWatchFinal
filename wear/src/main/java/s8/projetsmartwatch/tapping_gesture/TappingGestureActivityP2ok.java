@@ -35,8 +35,6 @@ private GoogleApiClient mApiC;
             new SimpleDateFormat("HH:mm", Locale.US);
 
     private BoxInsetLayout mContainerView;
-    private TextView mTextView;
-    private TextView mClockView;
     private Button buttonYes;
     private Button buttonNo;
     private TextView areUOk;
@@ -45,9 +43,42 @@ private GoogleApiClient mApiC;
     int yButton;
     Etat state;
 
+    Boolean p2Reponse = false ;
+    Boolean p1Reponse = false;
+
     @Override
     public void onMessageReceived(final MessageEvent messageEvent) {
-        //Pas de message reçu lors de la demande du are U OK?
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                if (messageEvent.getPath().equalsIgnoreCase(WEAR_MESSAGE_PATH)) {
+                    System.out.println(messageEvent.getPath().toString());
+                    String s = new String(messageEvent.getData());
+                    System.out.println(s);
+                    if (s.equalsIgnoreCase("P2IsOk")) {
+                        p2Reponse = true;
+                        if(p1Reponse){
+                            System.out.println("P1 viens de reponder");
+                            Intent intent = new Intent(TappingGestureActivityP2ok.this, MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    }
+                    if (s.equalsIgnoreCase("P2IsNotOk")) {
+                        p2Reponse = true;
+                        setContentView(R.layout.message_sent_to_the_fms);
+                    }
+                    if(s.equalsIgnoreCase("allIsfine")) {
+                        p2Reponse = true;
+                        Intent intent = new Intent(TappingGestureActivityP2ok.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+
+                }
+            }
+        });
     }
 
     public enum Etat {
@@ -58,6 +89,7 @@ private GoogleApiClient mApiC;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tapping_gesture_p2_ok);
+        p2Reponse = false;
         mApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
                 .build();
@@ -74,10 +106,9 @@ private GoogleApiClient mApiC;
 
         //setAmbientEnabled();
         mContainerView = (BoxInsetLayout) findViewById(R.id.container);
-        mTextView = (TextView) findViewById(R.id.text);
-        buttonYes = (Button) findViewById(R.id.buttonYes);
-        buttonNo = (Button) findViewById(R.id.buttonNo);
-        areUOk = (TextView) findViewById(R.id.areUOK);
+        buttonYes = (Button) findViewById(R.id.buttonYesForP2);
+        buttonNo = (Button) findViewById(R.id.buttonNoForP2);
+        areUOk = (TextView) findViewById(R.id.P2ok);
         buttonTappingGesture = (Button) findViewById(R.id.buttonTaping);
         System.out.println("buttonTappingGesture : " + buttonTappingGesture) ;
         xButton = (int) buttonTappingGesture.getX();
@@ -133,7 +164,6 @@ private GoogleApiClient mApiC;
 
     @Override
     public void onConnectionSuspended(int i) {
-
     }
 
     private void sendMessage(final String path, final String message){
@@ -149,10 +179,6 @@ private GoogleApiClient mApiC;
         }).start();
     }
 
-
-
-
-
     public boolean stayOnTheButtonTappingGesture(MotionEvent event, int numberOfPointer) {
 
         boolean res = true;
@@ -164,18 +190,29 @@ private GoogleApiClient mApiC;
         return res;
     }
 
+    //reponse a la question is P2 ok?
     public void callbackButtonNo() {
-        sendMessage(WEAR_MESSAGE_PATH, "notOk");
+        p1Reponse = true;
+        sendMessage(WEAR_MESSAGE_PATH, "P2IsnotOk");
         showButton();
         setContentView(R.layout.message_sent_to_the_fms);
+
     }
 
-
+    //reponse a la question is P2 ok?
     public void callbackButtonYes() {
-            showButton();
+        showButton();
+        p1Reponse = true;
+        if(p2Reponse){
+            p2Reponse = false;
             Intent intent = new Intent(TappingGestureActivityP2ok.this, MainActivity.class);
             startActivity(intent);
             finish();
+        } else {
+            sendMessage(WEAR_MESSAGE_PATH,"uSeemOk");
+            setContentView(R.layout.waitng_p2);
+        }
+
     }
 
     //premier doigt sur l'écran

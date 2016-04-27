@@ -18,6 +18,7 @@
     import s8.projetsmartwatch.etat.Etat;
     import s8.projetsmartwatch.tapping_gesture.TappingGestureActivityAlarme;
     import s8.projetsmartwatch.tapping_gesture.TappingGestureActivityAreUOK;
+    import s8.projetsmartwatch.tapping_gesture.TappingGestureActivityP2ok;
 
     public class MainActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks,MessageApi.MessageListener{
 
@@ -231,7 +232,9 @@
 
 
         public void changeActivityForP2ok(){
-
+            Intent intent = new Intent(MainActivity.this, TappingGestureActivityP2ok.class);
+            startActivity(intent);
+            finish();
         }
 
     }
