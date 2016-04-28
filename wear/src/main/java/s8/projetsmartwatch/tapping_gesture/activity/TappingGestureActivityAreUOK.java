@@ -43,8 +43,8 @@ private GoogleApiClient mApiC;
     private Button buttonNo;
     private TextView titre;
     private Button buttonTappingGesture;
-    int xButton;
-    int yButton;
+    private int xButton;
+    private int yButton;
     //La Vi
     TappingGestureView myView;
 
@@ -145,17 +145,13 @@ private GoogleApiClient mApiC;
         }).start();
     }
 
-
-
-
-    public void callbackButtonNo() {
+    private void callbackButtonNo() {
         sendMessage(WEAR_MESSAGE_PATH, "notOk");
         showButton();
         setContentView(R.layout.message_sent_to_the_fms);
     }
 
-
-    public void callbackButtonYes() {
+    private void callbackButtonYes() {
             showButton();
             Intent intent = new Intent(TappingGestureActivityAreUOK.this, MainActivity.class);
         finish();
@@ -183,7 +179,7 @@ private GoogleApiClient mApiC;
                 // the responding View or Activity.
                 xPosFinger1 = (int) MotionEventCompat.getX(event, 0);
                 yPosFinger1 = (int) MotionEventCompat.getY(event, 0);
-                xPosFinger2 = (int) MotionEventCompat.getX(event, 1);
+                xPosFinger2 = (int) MotionEventCompat.getX(event, 1);.
                 yPosFinger2 = (int) MotionEventCompat.getY(event, 1);
                 // Log.d("TappingGestureActivityAlarme", "Single touch event   x1 : " + xPosFinger1 +  "  y1 : " + yPosFinger1+
                 // "  x2 : " + xPosFinger2 +  "  y2 : " + yPosFinger2);

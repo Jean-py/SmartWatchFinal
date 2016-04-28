@@ -27,11 +27,11 @@
         private final static String WEAR_MESSAGE_PATH = "/message";
         private GoogleApiClient mApiClient;
         private GoogleApiClient mApiC;
-        Etat etat = Etat.PILOTING;
+        private Etat etat = Etat.PILOTING;
 
 
         private float y1,y2,x1,x2;
-        static final int MIN_DISTANCE = 150;
+        private static final int MIN_DISTANCE = 150;
 
         private static final String TAG = "PhoneActivity: ";
         @Override
@@ -126,23 +126,24 @@
                     for(Node node : nodes.getNodes()){
                         MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(
                                 mApiClient, node.getId(), path, message.getBytes()).await();
+
                     }
                 }
             }).start();
         }
 
-        public void changeActivityForAlarme(){
+        private void changeActivityForAlarme(){
             //System.out.println("BLOOOO");
             Intent intent = new Intent(MainActivity.this, TappingGestureActivityAlarme.class);
-            startActivity(intent);
             finish();
+            startActivity(intent);
         }
 
-        public void changeActivityForAreUOk(){
+        private void changeActivityForAreUOk(){
            // System.out.println("BLAAAA");
             Intent intent = new Intent(MainActivity.this, TappingGestureActivityAreUOK.class );
-            startActivity(intent);
             finish();
+            startActivity(intent);
         }
 
         @Override
@@ -204,12 +205,12 @@
         private void alarmType2CallBack() {
         }
 
-        public void alarmeVibrante(){
+        private void alarmeVibrante(){
             Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
             v.vibrate(1000);
         }
 
-        public void alarmeTotale(){
+        private void alarmeTotale(){
             alarmeVibrante();
             sonOn();
             int i=0;
@@ -220,7 +221,7 @@
 
         }
 
-        public void sonOn(){
+        private void sonOn(){
             sendMessage(WEAR_MESSAGE_PATH,"allumer");
         }
 
@@ -229,10 +230,10 @@
         }
 
 
-        public void changeActivityForP2ok(){
+        private void changeActivityForP2ok(){
             Intent intent = new Intent(MainActivity.this, TappingGestureActivityP2ok.class);
-            startActivity(intent);
             finish();
+            startActivity(intent);
         }
 
     }

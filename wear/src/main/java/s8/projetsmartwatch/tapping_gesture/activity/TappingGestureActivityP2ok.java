@@ -39,12 +39,12 @@ private GoogleApiClient mApiC;
     private Button buttonNo;
     private TextView areUOk;
     private Button buttonTappingGesture;
-    int xButton;
-    int yButton;
-    TappingGestureView tgv;
+    private int xButton;
+    private int yButton;
+    private TappingGestureView tgv;
 
-    Boolean p2Reponse = false ;
-    Boolean p1Reponse = false;
+    private Boolean p2Reponse = false ;
+    private Boolean p1Reponse = false;
 
     @Override
     public void onMessageReceived(final MessageEvent messageEvent) {
@@ -164,7 +164,7 @@ private GoogleApiClient mApiC;
     }
 
     //reponse a la question is P2 ok?
-    public void callbackButtonNo() {
+    private void callbackButtonNo() {
         p1Reponse = true;
         sendMessage(WEAR_MESSAGE_PATH, "P2IsnotOk");
         showButton();
@@ -173,7 +173,7 @@ private GoogleApiClient mApiC;
     }
 
     //reponse a la question is P2 ok?
-    public void callbackButtonYes() {
+    private void callbackButtonYes() {
         showButton();
         p1Reponse = true;
         if(p2Reponse){

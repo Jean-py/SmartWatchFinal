@@ -12,13 +12,13 @@ import s8.projetsmartwatch.tapping_gesture.interfaces.MyActivity;
 public class TappingGestureView implements View.OnTouchListener {
 
 
-    MyActivity tappingGA ;
-    String titre;
+    private MyActivity tappingGA ;
+    private String titre;
     public enum Etat {
-        INIT, FINGER1, FINGER2, TAPPING_GESTURE;
+        INIT, FINGER1, FINGER2, TAPPING_GESTURE
     }
 
-    Etat state;
+    private Etat state;
 
     public TappingGestureView(String titre, MyActivity tappingGA ) {
         super();
@@ -42,7 +42,7 @@ public class TappingGestureView implements View.OnTouchListener {
 
 
     //premier doigt sur l'écran
-    public void callbackButtonActionDown(MotionEvent event) {
+    private void callbackButtonActionDown(MotionEvent event) {
         //System.out.println("Action Down");
         switch (state) {
             case INIT:

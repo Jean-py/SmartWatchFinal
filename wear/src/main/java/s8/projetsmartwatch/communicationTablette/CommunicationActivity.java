@@ -94,11 +94,6 @@ public class CommunicationActivity extends Activity implements GoogleApiClient.C
         });
     }
 
-    public void alarme(View view){
-        sendMessage(WEAR_MESSAGE_PATH,"alarme");
-    }
-
-
 
     public void changeLayout(View view) {
         setContentView(R.layout.activity_main);

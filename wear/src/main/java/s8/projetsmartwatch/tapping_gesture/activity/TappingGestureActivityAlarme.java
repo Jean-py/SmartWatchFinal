@@ -30,10 +30,10 @@ public class TappingGestureActivityAlarme extends MyActivity {
     private Button buttonNo;
     private TextView areUOk;
     private Button buttonTappingGesture;
-    int xButton;
-    int yButton;
+    private int xButton;
+    private int yButton;
 
-    TappingGestureView tgv;
+    private TappingGestureView tgv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +76,7 @@ public class TappingGestureActivityAlarme extends MyActivity {
         return res;
     }
 
-    public void callbackButtonNo() {
+    private void callbackButtonNo() {
         Intent intent = new Intent(TappingGestureActivityAlarme.this, MainActivity.class );
         finish();
         startActivity(intent);
