@@ -58,7 +58,7 @@
 
 
     <Button
-        android:id="@+id/buttonTaping"
+        android:id="@+id/buttonTapingP2Ok"
         android:text="finger"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"

@@ -1,33 +1,40 @@
     package s8.projetsmartwatch;
 
+import android.content.Context;
+import android.os.Bundle;
+import android.os.Vibrator;
+import android.support.wearable.activity.WearableActivity;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
 
-    import android.content.Context;
-    import android.content.Intent;
-    import android.os.Bundle;
-    import android.os.Vibrator;
-    import android.support.v4.app.FragmentActivity;
-    import android.view.MotionEvent;
-    import android.view.View;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.Wearable;
 
-    import com.google.android.gms.common.api.GoogleApiClient;
-    import com.google.android.gms.wearable.MessageApi;
-    import com.google.android.gms.wearable.MessageEvent;
-    import com.google.android.gms.wearable.Node;
-    import com.google.android.gms.wearable.NodeApi;
-    import com.google.android.gms.wearable.Wearable;
+import java.util.ArrayList;
+import java.util.List;
 
-    import s8.projetsmartwatch.etat.Etat;
-    import s8.projetsmartwatch.tapping_gesture.activity.TappingGestureActivityAlarme;
-    import s8.projetsmartwatch.tapping_gesture.activity.TappingGestureActivityAreUOK;
-    import s8.projetsmartwatch.tapping_gesture.activity.TappingGestureActivityP2ok;
+import s8.projetsmartwatch.etat.Etat;
+import s8.projetsmartwatch.tapping_gesture.comportement.TappingGestureView;
 
-    public class MainActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks,MessageApi.MessageListener{
+
+    public class MainActivity extends WearableActivity implements GoogleApiClient.ConnectionCallbacks,MessageApi.MessageListener{
 
         private final static String START_ACTIVITY = "/start/activity";
         private final static String WEAR_MESSAGE_PATH = "/message";
         private GoogleApiClient mApiClient;
         private GoogleApiClient mApiC;
         private Etat etat = Etat.PILOTING;
+        private boolean p1Reponse;
+        private boolean p2Reponse;
+
+        private long[] mLongs;
+        Vibrator v ;
+
 
 
         private float y1,y2,x1,x2;
@@ -38,6 +45,12 @@
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.piloting_view);
+            mLongs = new long[]{0, 2000, 500};
+            v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            etat = Etat.PILOTING;
+            enabledSwipe();
+            p1Reponse = false;
+            p2Reponse = false;
             mApiClient = new GoogleApiClient.Builder(this)
                     .addApi(Wearable.API)
                     .build();
@@ -53,15 +66,6 @@
             }
 
 
-            //permet de swipe sur le mode
-            View v = findViewById(android.R.id.content);
-            v.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    callbackOnTouch(v,event);
-                    return false;
-                }
-            });
 
 
 
@@ -86,14 +90,27 @@
                     float deltaX = x2 - x1;
                     if (deltaY > MIN_DISTANCE && deltaY > 0) {
                         setContentView(R.layout.resting_view);
+                        etat = Etat.RESTING;
+                        sendMessage(WEAR_MESSAGE_PATH,"scenarioResting");
+                        enabledSwipe();
                     } else if(Math.abs(deltaY) > MIN_DISTANCE &&   deltaY < 0){
+                        sendMessage(WEAR_MESSAGE_PATH,"scenarioPiloting");
                         setContentView(R.layout.piloting_view);
+
+                        etat = Etat.PILOTING;
+                        enabledSwipe();
                     } else if(Math.abs(deltaX) > MIN_DISTANCE) {
+                        sendMessage(WEAR_MESSAGE_PATH,"scenarioSending");
                         setContentView(R.layout.send_message_view);
+                        enabledSwipe();
                     }
+
                     break;
             }
+            System.out.println("[WEAR]  etat : " + etat);
         }
+
+
 
 
         @Override
@@ -132,40 +149,27 @@
             }).start();
         }
 
-        private void changeActivityForAlarme(){
-            //System.out.println("BLOOOO");
-            Intent intent = new Intent(MainActivity.this, TappingGestureActivityAlarme.class);
-            finish();
-            startActivity(intent);
-        }
-
-        private void changeActivityForAreUOk(){
-           // System.out.println("BLAAAA");
-            Intent intent = new Intent(MainActivity.this, TappingGestureActivityAreUOK.class );
-            finish();
-            startActivity(intent);
-        }
-
         @Override
         public void onMessageReceived(final MessageEvent messageEvent) {
+
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if (messageEvent.getPath().equalsIgnoreCase(WEAR_MESSAGE_PATH)) {
-                        System.out.println(messageEvent.getPath().toString());
+                       // System.out.println(messageEvent.getPath().toString());
                         String s = new String(messageEvent.getData());
-                        System.out.println("Message received "+ s);
+                        //System.out.println("Message received "+ s);
                         //probleme du cockpit ou envois d'un message du p2 ou probleme de santé du P2
                         if (s.equalsIgnoreCase("alarmeTotale") ) {
-                            System.out.println("alarme totale, ETAT : " + etat);
+                           // System.out.println("alarme totale, ETAT : " + etat);
                             switch(etat){
                                 case PILOTING:
                                     alarmeVibrante();
-                                    changeActivityForAlarme();
+                                    changeViewForAlarme();
                                     break;
                                 case RESTING:
                                     alarmeTotale();
-                                    changeActivityForAlarme();
+                                    changeViewForAlarme();
                                     break;
                             }
                         }
@@ -174,11 +178,11 @@
                             switch(etat){
                                 case PILOTING :
                                     alarmeVibrante();
-                                    changeActivityForAreUOk();
+                                    changeViewForAreUOk();
                                     break;
                                 case RESTING:
                                     alarmeTotale();
-                                    changeActivityForAreUOk();
+                                    changeViewForAreUOk();
                                     break;
                             }
                         }
@@ -186,12 +190,59 @@
                             switch(etat){
                                 case PILOTING :
                                     alarmeVibrante();
-                                    changeActivityForP2ok();
+                                    changeViewForP2ok();
                                     break;
                                 case RESTING:
                                     alarmeTotale();
-                                    changeActivityForP2ok();
+                                    changeViewForP2ok();
                                     break;
+                            }
+                        }
+                        if (s.equalsIgnoreCase("P2IsOk")) {
+                            p2Reponse = true;
+                            //System.out.println(" P1 reponse : " + p1Reponse);
+                            System.out.println("[WEAR] p1Reponse " + p1Reponse);
+                            if(p1Reponse){
+                              //  System.out.println("P1 vient de repondre");
+                                setContentView(R.layout.piloting_view);
+                                etat = Etat.PILOTING;
+                                sendMessage(WEAR_MESSAGE_PATH,"scenarioPiloting");
+                                enabledSwipe();
+                                p2Reponse = false;
+                                p1Reponse = false;
+                            }
+                        }
+                        if (s.equalsIgnoreCase("P2IsNotOk")) {
+                            p2Reponse = true;
+                            setContentView(R.layout.message_sent_to_the_fms);
+                            disabledSwipe();
+                            p2Reponse = false;
+                            p1Reponse = false;
+                        }
+                        if(s.equalsIgnoreCase("allIsfine")) {
+                            p2Reponse = true;
+                            setContentView(R.layout.piloting_view);
+                            etat= Etat.PILOTING;
+                            sendMessage(WEAR_MESSAGE_PATH,"scenarioPiloting");
+                            enabledSwipe();
+                            p2Reponse = false;
+
+                        }if(s.equalsIgnoreCase("p1NotOk")) {
+                            p2Reponse = true;
+                            setContentView(R.layout.message_sent_to_the_fms);
+                            disabledSwipe();
+                            p2Reponse = false;
+                        }
+                        if(s.equalsIgnoreCase("uSeemOk")) {
+                            p2Reponse = true;
+                            if(p1Reponse) {
+                               // System.out.println("P1 vient de repondre");
+                                p1Reponse = false;
+                                setContentView(R.layout.piloting_view);
+                                sendMessage(WEAR_MESSAGE_PATH,"scenarioPiloting");
+                                etat = Etat.PILOTING;
+                                enabledSwipe();
+                                p2Reponse = false;
                             }
                         }
                     }
@@ -199,41 +250,200 @@
             });
         }
 
-        private void alarmeType3CallBack() {
+        private void changeViewForAlarme(){
+            setContentView(R.layout.tapping_gesture_alarme);
+            disabledSwipe();
+            Button buttonStop = (Button) findViewById(R.id.buttonStop);
+            Button buttonTappingGesture = (Button) findViewById(R.id.buttonTapingAlarme);
+
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(buttonStop);
+            TappingGestureView tgv = new TappingGestureView("my tapping gesture 1",buttons);
+            buttonTappingGesture.setOnTouchListener(tgv);
+            buttonStop.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    retourPilotingMode(v);
+                }
+            });
+
+
+
         }
 
-        private void alarmType2CallBack() {
+        private void callbackButtonNo() {
+            sendMessage(WEAR_MESSAGE_PATH, "notOk");
+            eteindreAll();
+            setContentView(R.layout.message_sent_to_the_fms);
+            disabledSwipe();
         }
+
 
         private void alarmeVibrante(){
-            Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-            v.vibrate(1000);
+            v.vibrate(mLongs,0);
         }
 
         private void alarmeTotale(){
+
             alarmeVibrante();
             sonOn();
-            int i=0;
-            while(i<1000000)
-                i++;
-            //sonOff();
-
-
         }
 
         private void sonOn(){
+            System.out.println("[WEAR] son ON");
             sendMessage(WEAR_MESSAGE_PATH,"allumer");
         }
 
-        public void sonOff(){
+        public void eteindreAll(){
+            System.out.println("[WEAR] son OFF");
             sendMessage(WEAR_MESSAGE_PATH, "eteindre");
+            v.cancel();
         }
 
 
-        private void changeActivityForP2ok(){
-            Intent intent = new Intent(MainActivity.this, TappingGestureActivityP2ok.class);
-            finish();
-            startActivity(intent);
+
+        private void changeViewForAreUOk(){
+            setContentView(R.layout.tapping_gesture_areuok);
+            disabledSwipe();
+            Button buttonYesAreUok = (Button) findViewById(R.id.buttonYesAreUOk);
+            Button buttonNoAreUOk = (Button) findViewById(R.id.buttonNoAreUOk);
+            Button buttonTappingGesture = (Button) findViewById(R.id.buttonTapingAreUok);
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(buttonYesAreUok);
+            buttons.add(buttonNoAreUOk);
+            TappingGestureView tgv = new TappingGestureView("my tapping gesture 1",buttons);
+            buttonTappingGesture.setOnTouchListener(tgv);
+            //listener bouton No
+            buttonNoAreUOk.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    callbackButtonNo();
+                }
+            });
+            //listener bouton yes
+            p1Reponse = false;
+            buttonYesAreUok.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    eteindreAll();
+                    if(p2Reponse){
+                        p2Reponse = false;
+                        p1Reponse = false;
+                        retourPilotingMode(v);
+                    } else {
+                        p1Reponse = true;
+                        setContentView(R.layout.waitng_p2);
+                        disabledSwipe();
+                    }
+                }
+            });
+        }
+
+        private void changeViewForP2ok(){
+            setContentView(R.layout.tapping_gesture_p2_ok);
+            disabledSwipe();
+            Button buttonNoForP2 = (Button) findViewById(R.id.buttonNoForP2);
+            Button buttonYesForP2 = (Button) findViewById(R.id.buttonYesForP2);
+            Button buttonTappingGesture = (Button) findViewById(R.id.buttonTapingP2Ok);
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(buttonNoForP2);
+            buttons.add(buttonYesForP2);
+            TappingGestureView tgv = new TappingGestureView("my tapping gesture 1",buttons);
+            buttonTappingGesture.setOnTouchListener(tgv);
+            //listener bouton No
+            buttonNoForP2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    callbackButtonNoForP2();
+                }
+            });
+            //listener bouton yes
+            buttonYesForP2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    callbackButtonYesForP2(v);
+                }
+            });
+        }
+
+
+
+
+        //reponse a la question is P2 ok?
+        private void callbackButtonNoForP2() {
+           // System.out.println("P2 is ok : Callback button No");
+            eteindreAll();
+            sendMessage(WEAR_MESSAGE_PATH, "P2IsnotOk");
+            setContentView(R.layout.message_sent_to_the_fms);
+            disabledSwipe();
+        }
+
+        //reponse a la question is P2 ok?
+        private void callbackButtonYesForP2(View v) {
+           // System.out.println("P2 is ok : Callback button yes");
+            p1Reponse = true;
+            //System.out.println("p1 : " + p1Reponse + "p2 : " + p2Reponse);
+            if(p2Reponse){
+                p2Reponse = false;
+                p1Reponse = false;
+                eteindreAll();
+                retourPilotingMode(v);
+            } else {
+                sendMessage(WEAR_MESSAGE_PATH,"uSeemOk");
+                eteindreAll();
+                setContentView(R.layout.waitng_p2);
+                disabledSwipe();
+                //permet de swipe sur le mode
+                View currentView = findViewById(android.R.id.content);
+                currentView.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        return false;
+                    }
+                });
+            }
+        }
+
+
+        public void retourPilotingMode(View v){
+            eteindreAll();
+            setContentView(R.layout.piloting_view);
+            etat = Etat.PILOTING;
+            sendMessage(WEAR_MESSAGE_PATH,"scenarioPiloting");
+            enabledSwipe();
+            p1Reponse = false;
+
+        }
+
+        //permet de placer le swipe de mode sur la vue courante
+        public void enabledSwipe(){
+            View v = findViewById(android.R.id.content);
+            v.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    callbackOnTouch(v,event);
+                    return false;
+                }
+            });
+
+        }
+
+        public void disabledSwipe(){
+            View v = findViewById(android.R.id.content);
+            v.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    return false;
+                }
+            });
+        }
+
+        public void sendMessageToFMS(View v){
+            sendMessage(WEAR_MESSAGE_PATH,"Message to FMS");
+        }
+
+        public void sendMessageToP2(View v){
+            sendMessage(WEAR_MESSAGE_PATH,"Message to P2");
         }
 
     }

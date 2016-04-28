@@ -14,18 +14,34 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Pilot #1 : Piloting Mode"
-            />
+            android:id="@+id/textViewEtatMontre" />
 
-        <!-- PREMIERE SEEKBAR -->
-    <!-- FIN PREMIERE SEEKBAR -->
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/scenario1Health"
-        android:text="Probleme de santé"
+        android:text="Probleme de santés"
         android:onClick="scenario1HealthP1"
         />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Non"
+        android:id="@+id/p2SaidNo"
+        android:visibility="invisible"
+        android:onClick="p2SaidNoCallBack"
+     />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Oui"
+        android:id="@+id/p2SaidYes"
+        android:visibility="invisible"
+        android:onClick="p2SaidYesCallBack"
+      />
 
     <View
             android:layout_width="wrap_content"
@@ -59,7 +75,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="oui"
+        android:text="Oui"
         android:id="@+id/buttonYesScenario1P2"
         android:onClick="buttonYesScenario1P2"
         android:visibility="invisible"/>
@@ -71,26 +87,15 @@
 
         </LinearLayout>
 
-    <!-- FIN DEUXIEME SEEKBAR -->
-
-
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Send Alerte to P1"
             android:onClick="scenario1SendAlert"/>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="switch to Scenario 2"
-        android:id="@+id/button"
-        android:layout_gravity="right"
-        android:onClick="switchScenario2"/>
-
     <TextView
         android:layout_width="171dp"
-        android:layout_height="match_parent"
+        android:layout_height="56dp"
         android:text=" Reponse P1 "
         android:id="@+id/textView" />
 

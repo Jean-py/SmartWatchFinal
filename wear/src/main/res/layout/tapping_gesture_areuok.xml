@@ -5,7 +5,6 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".tapping_gesture.activity.TappingGestureActivityAlarme"
     tools:deviceIds="wear"
     android:background="@color/black"
     >
@@ -23,7 +22,7 @@
         />
 
     <Button
-        android:id="@+id/buttonNo"
+        android:id="@+id/buttonNoAreUOk"
         android:text="NO"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -40,7 +39,7 @@
 
 
     <Button
-        android:id="@+id/buttonYes"
+        android:id="@+id/buttonYesAreUOk"
         android:text="YES"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -58,7 +57,7 @@
 
 
     <Button
-        android:id="@+id/buttonTaping"
+        android:id="@+id/buttonTapingAreUok"
         android:text="finger"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"

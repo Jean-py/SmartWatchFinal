@@ -4,32 +4,31 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 
-import s8.projetsmartwatch.tapping_gesture.interfaces.MyActivity;
+import java.util.List;
 
 /**
  * Created by jp on 28/04/16.
  */
 public class TappingGestureView implements View.OnTouchListener {
 
-
-    private MyActivity tappingGA ;
     private String titre;
+    List<Button> myButtons;
     public enum Etat {
         INIT, FINGER1, FINGER2, TAPPING_GESTURE
     }
-
     private Etat state;
-
-    public TappingGestureView(String titre, MyActivity tappingGA ) {
+    public TappingGestureView(String titre , List<Button> buttons) {
         super();
         this.titre = titre;
 
         this.state = Etat.INIT;
-        this.tappingGA = tappingGA;
+
+        for (Button b: buttons) {
+            this.myButtons = buttons;
+        }
     }
 
-        public boolean stayOnTheButtonTappingGesture(MotionEvent event, int numberOfPointer, Button buttonTappingGesture) {
-
+    public boolean stayOnTheButtonTappingGesture(MotionEvent event, int numberOfPointer, Button buttonTappingGesture) {
         boolean res = true;
         for (int i = 0; i < numberOfPointer; i++) {
             System.out.println(" getX(" + i + ") : " + event.getX(i) + "   buttonTappingGesture.getX() : " + buttonTappingGesture.getX());
@@ -66,14 +65,14 @@ public class TappingGestureView implements View.OnTouchListener {
                 break;
             case FINGER1:
                 state = Etat.FINGER2;
-                tappingGA.hideButton();
+                hideButton();
                 break;
             case FINGER2:
                 //nothing
                 break;
             case TAPPING_GESTURE:
                 state = Etat.FINGER2;
-                tappingGA.showButton();
+                showButton();
                 break;
         }
     }
@@ -87,15 +86,15 @@ public class TappingGestureView implements View.OnTouchListener {
                 break;
             case FINGER1:
                 state = Etat.INIT;
-                tappingGA.hideButton();
+                hideButton();
                 break;
             case FINGER2:
                 state = Etat.INIT;
-                tappingGA.hideButton();
+                hideButton();
                 break;
             case TAPPING_GESTURE:
                 state = Etat.INIT;
-                tappingGA. hideButton();
+                 hideButton();
                 break;
         }
     }
@@ -110,13 +109,12 @@ public class TappingGestureView implements View.OnTouchListener {
                 break;
             case FINGER2:
                 state = Etat.TAPPING_GESTURE;
-                tappingGA.showButton();
+                showButton();
                 break;
             case TAPPING_GESTURE: // impossible
                 break;
         }
     }
-
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -140,4 +138,21 @@ public class TappingGestureView implements View.OnTouchListener {
             }
             return true;
     }
+
+    public void showButton() {
+        for (Button b : myButtons){
+            if(b!=null){
+                b.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    public void hideButton() {
+        for (Button b : myButtons){
+            if(b!=null)
+                b.setVisibility(View.INVISIBLE);
+        }
+    }
 }
+
+

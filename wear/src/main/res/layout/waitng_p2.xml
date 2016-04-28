@@ -7,13 +7,15 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="match_parent"
         android:text="Waiting for P2..."
-        android:id="@+id/textView"
-        android:layout_gravity="center_horizontal"
+        android:id="@+id/textViewForP2"
+        android:layout_gravity="center"
         android:textColor="@color/green"
         android:gravity="center"
         android:textSize="30dp"
+
+
 
         />
 </LinearLayout>
