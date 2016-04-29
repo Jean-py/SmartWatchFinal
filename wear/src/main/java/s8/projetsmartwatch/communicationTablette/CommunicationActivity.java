@@ -3,7 +3,6 @@ package s8.projetsmartwatch.communicationTablette;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.View;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.MessageApi;
@@ -26,7 +25,7 @@ public class CommunicationActivity extends Activity implements GoogleApiClient.C
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.piloting_view);
         mApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
                 .build();
@@ -95,7 +94,4 @@ public class CommunicationActivity extends Activity implements GoogleApiClient.C
     }
 
 
-    public void changeLayout(View view) {
-        setContentView(R.layout.activity_main);
-    }
 }

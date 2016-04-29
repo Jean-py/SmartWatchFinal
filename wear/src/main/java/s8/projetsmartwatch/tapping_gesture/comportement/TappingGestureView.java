@@ -12,7 +12,7 @@ import java.util.List;
 public class TappingGestureView implements View.OnTouchListener {
 
     private String titre;
-    List<Button> myButtons;
+   List<Button> myButtons;
     public enum Etat {
         INIT, FINGER1, FINGER2, TAPPING_GESTURE
     }
@@ -20,12 +20,9 @@ public class TappingGestureView implements View.OnTouchListener {
     public TappingGestureView(String titre , List<Button> buttons) {
         super();
         this.titre = titre;
-
         this.state = Etat.INIT;
 
-        for (Button b: buttons) {
-            this.myButtons = buttons;
-        }
+        myButtons =  buttons;
     }
 
     public boolean stayOnTheButtonTappingGesture(MotionEvent event, int numberOfPointer, Button buttonTappingGesture) {

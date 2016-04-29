@@ -3,6 +3,7 @@ package s8.projetsmartwatch;
 import android.app.Activity;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -41,7 +42,7 @@ public class MainActivity extends Activity implements MessageApi.MessageListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scenario1);
         mp = MediaPlayer.create(this,R.raw.alarm);
-        mp.setLooping(true);
+
 
         bYes = (Button)findViewById(R.id.buttonYesScenario1P2);
         bNo = (Button) findViewById(R.id.buttonNoScenario1P2);
@@ -61,7 +62,8 @@ public class MainActivity extends Activity implements MessageApi.MessageListener
             mApiClient.connect();
         }
         textViewEtatMontre = (TextView) findViewById(R.id.textViewEtatMontre);
-        textViewP1Reponse = (TextView) findViewById(R.id.textView);
+        textViewP1Reponse = (TextView) findViewById(R.id.textViewP1Reponse);
+        textViewP1Reponse.setMovementMethod(new ScrollingMovementMethod());
     }
 
     @Override
@@ -102,67 +104,60 @@ public class MainActivity extends Activity implements MessageApi.MessageListener
 
     @Override
     public void onMessageReceived(final MessageEvent messageEvent) {
-        messageRecu = new String(messageEvent.getData());
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 String s = " " ;
                 if (messageEvent.getPath().equalsIgnoreCase(WEAR_MESSAGE_PATH)) {
-                    System.out.println("mobile message received : " + messageEvent.getPath().toString());
+                    //System.out.println("mobile message received : " + messageEvent.getPath().toString());
                     s = new String(messageEvent.getData());
-                    System.out.println(s);
-
                     if(s.equalsIgnoreCase("notOk") ){
-                        textViewP1Reponse.setText(messageRecu);
+                     //   textViewP1Reponse.append(messageRecu);
                     }
                     //reception d'un message P1 lors d'un probleme de santé de P2
                     if(s.equalsIgnoreCase("P2IsnotOk") ){
-                        System.out.println("Alarme P2 is not OK");
-                        textViewP1Reponse.setText("P2isNotOk");
                         messageRecu= "P2IsnotOk";
                         p1Reponse =true;
                     }
                     if(s.equalsIgnoreCase("uSeemOk") ){
-
                         messageRecu = "uSeemOk";
-                        textViewP1Reponse.setText("P2 Seem Ok");
                         p1Reponse = true;
                     }
                     if(s.equalsIgnoreCase("scenarioPiloting") ){
                         messageRecu = "scenarioPiloting";
-                        textViewP1Reponse.setText("switch to scenario Piloting");
                         textViewEtatMontre.setText("Pilot #1 : Piloting mode");
                     }
                     if(s.equalsIgnoreCase("scenarioResting") ){
                         messageRecu = "scenarioResting";
-                        textViewP1Reponse.setText("switch to scenario resting");
                         textViewEtatMontre.setText("Pilot #1 : Resting mode");
                     }
                     if(s.equalsIgnoreCase("scenarioSending") ){
                         messageRecu = "scenarioSending";
-                        textViewP1Reponse.setText("Switch to scenarioSending");
                         textViewEtatMontre.setText("Pilot #1 : Sending mode");
                     }
                     if( s.equalsIgnoreCase("eteindre") ) {
                         eteindreSon();
-
                     }
                     if( s.equalsIgnoreCase("allumer") ){
                         allumerSon();
                     }
-                    textViewP1Reponse.setText(messageRecu);
+                    textViewP1Reponse.append(s + "\n");
                 }
             }
         });
     }
 
+    int i = 0;
+
     public void eteindreSon() {
-        System.out.println("[MOBILE] son off");
-        mp.pause();
+        if(mp.isPlaying())
+            mp.pause();
     }
 
     public void allumerSon() {
-        System.out.println("[MOBILE] son on");
+
+       // mp.reset();
+
         mp.start();
     }
 
@@ -174,7 +169,7 @@ public class MainActivity extends Activity implements MessageApi.MessageListener
     //envois de l'affichage de are u ok au P1
     public void scenario1HealthP1(View v){
         sendMessage(WEAR_MESSAGE_PATH, "areUOK");
-        System.out.println("[MOBILE] click proleme P1 (envois de areUok) ");
+        //System.out.println("[MOBILE] click proleme P1 (envois de areUok) ");
         showButtonP1YesNo();
     }
 
@@ -214,8 +209,6 @@ public class MainActivity extends Activity implements MessageApi.MessageListener
         hideButtonP2YesNo();
         sendMessage(WEAR_MESSAGE_PATH,"P2IsNotOk");
         eteindreSon();
-
-
     }
 
 
@@ -223,7 +216,7 @@ public class MainActivity extends Activity implements MessageApi.MessageListener
         hideButtonP2YesNo();
         sendMessage(WEAR_MESSAGE_PATH,"P2IsOk");
         hideButtonP2YesNo();
-        textViewP1Reponse.setText(" en attente d'un message ... ");
+        textViewP1Reponse.append(" en attente d'un message ... " +"\n");
     }
 
 

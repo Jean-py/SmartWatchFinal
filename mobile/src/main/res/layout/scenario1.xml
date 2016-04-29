@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingBottom="@dimen/activity_vertical_margin"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:weightSum="1"
 
-        <TextView
-            android:textSize="40px"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Pilot #1 : Piloting Mode"
-            android:id="@+id/textViewEtatMontre" />
+    >
+
+    <TextView
+        android:textSize="40px"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pilot #1 : Piloting Mode"
+        android:id="@+id/textViewEtatMontre" />
 
 
     <Button
@@ -50,12 +52,13 @@
             android:layout_marginTop="100px"
             android:layout_marginBottom="50px"/>
 
-        <TextView
-            android:textSize="40px"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Pilot #2 : Piloting Mode"
-            android:layout_marginBottom="30px"/>
+    <TextView
+        android:textSize="40px"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pilot #2 : Piloting Mode"
+        android:layout_marginBottom="30px"
+        android:id="@+id/TextViewP2"/>
 
     <Button
         android:layout_width="wrap_content"
@@ -78,25 +81,22 @@
         android:text="Oui"
         android:id="@+id/buttonYesScenario1P2"
         android:onClick="buttonYesScenario1P2"
-        android:visibility="invisible"/>
+        android:visibility="invisible"
+        />
 
-    <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-        </LinearLayout>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Send Alerte to P1"
-            android:onClick="scenario1SendAlert"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send Alerte to P1"
+        android:onClick="scenario1SendAlert" />
 
     <TextView
-        android:layout_width="171dp"
-        android:layout_height="56dp"
-        android:text=" Reponse P1 "
-        android:id="@+id/textView" />
+        android:layout_width="396dp"
+        android:layout_height="wrap_content"
+        android:text=" Reponse P1 : \n "
+        android:id="@+id/textViewP1Reponse"
+        android:maxLines = "100000"
+        android:scrollbars = "vertical"/>
+
 
 </LinearLayout>

@@ -33,7 +33,7 @@ import s8.projetsmartwatch.tapping_gesture.comportement.TappingGestureView;
         private boolean p2Reponse;
 
         private long[] mLongs;
-        Vibrator v ;
+        Vibrator vibrator;
 
 
 
@@ -46,7 +46,7 @@ import s8.projetsmartwatch.tapping_gesture.comportement.TappingGestureView;
             super.onCreate(savedInstanceState);
             setContentView(R.layout.piloting_view);
             mLongs = new long[]{0, 2000, 500};
-            v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
             etat = Etat.PILOTING;
             enabledSwipe();
             p1Reponse = false;
@@ -103,7 +103,10 @@ import s8.projetsmartwatch.tapping_gesture.comportement.TappingGestureView;
                         sendMessage(WEAR_MESSAGE_PATH,"scenarioSending");
                         setContentView(R.layout.send_message_view);
                         enabledSwipe();
-                    }
+                    }/*else if(deltaX < MIN_DISTANCE  ){
+                        //empecher le swipe de gauche a droite
+                        //nothing
+                    }*/
 
                     break;
             }
@@ -121,6 +124,7 @@ import s8.projetsmartwatch.tapping_gesture.comportement.TappingGestureView;
         @Override
         protected void onDestroy(){
             super.onDestroy();
+            eteindreAll();
             mApiClient.disconnect();
         }
 
@@ -143,7 +147,6 @@ import s8.projetsmartwatch.tapping_gesture.comportement.TappingGestureView;
                     for(Node node : nodes.getNodes()){
                         MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(
                                 mApiClient, node.getId(), path, message.getBytes()).await();
-
                     }
                 }
             }).start();
@@ -216,6 +219,7 @@ import s8.projetsmartwatch.tapping_gesture.comportement.TappingGestureView;
                             p2Reponse = true;
                             setContentView(R.layout.message_sent_to_the_fms);
                             disabledSwipe();
+                            eteindreAll();
                             p2Reponse = false;
                             p1Reponse = false;
                         }
@@ -230,6 +234,7 @@ import s8.projetsmartwatch.tapping_gesture.comportement.TappingGestureView;
                         }if(s.equalsIgnoreCase("p1NotOk")) {
                             p2Reponse = true;
                             setContentView(R.layout.message_sent_to_the_fms);
+                            eteindreAll();
                             disabledSwipe();
                             p2Reponse = false;
                         }
@@ -280,11 +285,10 @@ import s8.projetsmartwatch.tapping_gesture.comportement.TappingGestureView;
 
 
         private void alarmeVibrante(){
-            v.vibrate(mLongs,0);
+            vibrator.vibrate(mLongs,0);
         }
 
         private void alarmeTotale(){
-
             alarmeVibrante();
             sonOn();
         }
@@ -295,9 +299,13 @@ import s8.projetsmartwatch.tapping_gesture.comportement.TappingGestureView;
         }
 
         public void eteindreAll(){
-            System.out.println("[WEAR] son OFF");
-            sendMessage(WEAR_MESSAGE_PATH, "eteindre");
-            v.cancel();
+            if(etat == Etat.RESTING){
+                System.out.println("[WEAR] son OFF");
+                sendMessage(WEAR_MESSAGE_PATH, "eteindre");
+            }
+            vibrator.cancel();
+            //sendMessage(WEAR_MESSAGE_PATH, "eteindre");
+
         }
 
 
@@ -325,7 +333,7 @@ import s8.projetsmartwatch.tapping_gesture.comportement.TappingGestureView;
             buttonYesAreUok.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    eteindreAll();
+
                     if(p2Reponse){
                         p2Reponse = false;
                         p1Reponse = false;
@@ -335,6 +343,7 @@ import s8.projetsmartwatch.tapping_gesture.comportement.TappingGestureView;
                         setContentView(R.layout.waitng_p2);
                         disabledSwipe();
                     }
+                    eteindreAll();
                 }
             });
         }
@@ -379,15 +388,13 @@ import s8.projetsmartwatch.tapping_gesture.comportement.TappingGestureView;
         }
 
         //reponse a la question is P2 ok?
-        private void callbackButtonYesForP2(View v) {
-           // System.out.println("P2 is ok : Callback button yes");
+        private void callbackButtonYesForP2(View view) {
+
             p1Reponse = true;
-            //System.out.println("p1 : " + p1Reponse + "p2 : " + p2Reponse);
             if(p2Reponse){
                 p2Reponse = false;
                 p1Reponse = false;
-                eteindreAll();
-                retourPilotingMode(v);
+                retourPilotingMode(view);
             } else {
                 sendMessage(WEAR_MESSAGE_PATH,"uSeemOk");
                 eteindreAll();
@@ -402,6 +409,7 @@ import s8.projetsmartwatch.tapping_gesture.comportement.TappingGestureView;
                     }
                 });
             }
+            eteindreAll();
         }
 
 
@@ -440,10 +448,12 @@ import s8.projetsmartwatch.tapping_gesture.comportement.TappingGestureView;
 
         public void sendMessageToFMS(View v){
             sendMessage(WEAR_MESSAGE_PATH,"Message to FMS");
+            retourPilotingMode(v);
         }
 
         public void sendMessageToP2(View v){
             sendMessage(WEAR_MESSAGE_PATH,"Message to P2");
+            retourPilotingMode(v);
         }
 
     }
